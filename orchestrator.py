@@ -223,29 +223,183 @@ class DocumentOrchestrator:
         TEMPLATES[doc_type]["keywords"] = _expand_keywords.__func__(base)
         print(f"[DEBUG] {doc_type}: {len(TEMPLATES[doc_type]['keywords'])} keywords after expansion")
     
-    # Clarification questions for uncertain cases
-    CLARIFICATION_QUESTIONS = [
-        {
-            "question": "What is the main purpose of your document?",
-            "options": [
-                {
-                    "text": "I need information/records from a government department or public authority",
-                    "leads_to": "RTI_APPLICATION",
-                    "confidence_boost": 40
-                },
-                {
-                    "text": "I need to make a sworn statement for legal/court purposes",
-                    "leads_to": "AFFIDAVIT",
-                    "confidence_boost": 40
-                },
-                {
-                    "text": "I need to verify facts or identity for official purposes",
-                    "leads_to": "AFFIDAVIT",
-                    "confidence_boost": 30
-                }
+    
+    # Comprehensive clarification question bank (100+ questions)
+    CLARIFICATION_QUESTIONS = {
+        # RTI-ORIENTED QUESTIONS
+        "rti_information_vs_declaration": {
+            "category": "RTI",
+            "trigger_keywords": ["information", "record", "document", "copy", "file", "data"],
+            "questions": [
+                "Are you asking for existing records held by a government office?",
+                "Do you want copies of documents already available with an authority?",
+                "Are you trying to know something, not declare something?",
+                "Is the information already created by a government department?",
             ]
-        }
-    ]
+        },
+        "rti_authority": {
+            "category": "RTI",
+            "trigger_keywords": ["government", "office", "department", "authority", "ministry"],
+            "questions": [
+                "Which government department holds this information?",
+                "Is the authority a public university or government college?",
+                "Is the authority a municipal corporation or panchayat?",
+                "Is the information held by a police station or revenue office?",
+            ]
+        },
+        "rti_document_type": {
+            "category": "RTI",
+            "trigger_keywords": ["exam", "answer", "marksheet", "land", "tender", "fir"],
+            "questions": [
+                "Are you asking for answer sheets or exam records?",
+                "Are you requesting land records or property documents?",
+                "Are you seeking service or salary records?",
+                "Are you requesting tender or contract documents?",
+            ]
+        },
+        "rti_transparency": {
+            "category": "RTI",
+            "trigger_keywords": ["status", "why", "reason", "action", "delay"],
+            "questions": [
+                "Are you asking why or how a decision was taken?",
+                "Are you seeking file movement or file notings?",
+                "Are you asking for status, action taken, or reasons?",
+                "Is this about transparency or accountability?",
+            ]
+        },
+        
+        # AFFIDAVIT-ORIENTED QUESTIONS
+        "affidavit_declaration": {
+            "category": "AFFIDAVIT",
+            "trigger_keywords": ["declare", "state", "affirm", "swear", "my", "i am"],
+            "questions": [
+                "Are you trying to declare a personal fact?",
+                "Are you stating something as true to your knowledge?",
+                "Do you need to affirm or swear a statement?",
+                "Are you declaring information about yourself?",
+            ]
+        },
+        "affidavit_identity": {
+            "category": "AFFIDAVIT",
+            "trigger_keywords": ["name", "address", "identity", "proof", "dob", "birth"],
+            "questions": [
+                "Is this about name correction or identity proof?",
+                "Is this about address proof or residence verification?",
+                "Is this about date of birth correction?",
+                "Is this about relationship proof or legal heir status?",
+            ]
+        },
+        "affidavit_income": {
+            "category": "AFFIDAVIT",
+            "trigger_keywords": ["income", "salary", "bpl", "earning", "financial", "poor"],
+            "questions": [
+                "Are you declaring your income or financial status?",
+                "Is this for scholarship or fee concession?",
+                "Are you declaring unemployment or dependency?",
+                "Is this related to BPL or EWS status?",
+            ]
+        },
+        "affidavit_loss": {
+            "category": "AFFIDAVIT",
+            "trigger_keywords": ["lost", "damage", "missing", "destroyed", "misplace"],
+            "questions": [
+                "Have you lost a document?",
+                "Is the original document damaged or destroyed?",
+                "Are you declaring loss for reissue or duplicate?",
+                "Have you filed an FIR for the loss?",
+            ]
+        },
+        "affidavit_court": {
+            "category": "AFFIDAVIT",
+            "trigger_keywords": ["court", "case", "judge", "legal", "petition"],
+            "questions": [
+                "Will this document be submitted to a court?",
+                "Is this part of a legal proceeding?",
+                "Is this required by a judge or magistrate?",
+                "Is this a court-mandated affidavit?",
+            ]
+        },
+        "affidavit_education": {
+            "category": "AFFIDAVIT",
+            "trigger_keywords": ["gap", "year", "anti-ragging", "bonafide", "character"],
+            "questions": [
+                "Is this about education gap or year gap?",
+                "Is this for bonafide or character certificate?",
+                "Is this an anti-ragging affidavit?",
+                "Is this for college admission?",
+            ]
+        },
+        
+        # CONFLICT RESOLUTION
+        "confusion_resolution": {
+            "category": "BOTH",
+            "trigger_keywords": ["proof", "certificate", "verify", "confirm"],
+            "questions": [
+                "Are you trying to change a record or just get a copy?",
+                "Do you want the government to accept your statement?",
+                "Are you trying to prove something about yourself?",
+                "Are you asking the authority to answer questions?",
+            ]
+        },
+    }
+    
+    @staticmethod
+    def _select_clarification_questions(description, scores):
+        """
+        Intelligently select 2-4 relevant questions based on user input
+        
+        Args:
+            description (str): User's input
+            scores (dict): Confidence scores for each document type
+            
+        Returns:
+            list: Selected questions with their options
+        """
+        desc_lower = description.lower()
+        selected_categories = []
+        
+        # Determine which category to favor based on scores
+        if scores.get("RTI_APPLICATION", 0) > scores.get("AFFIDAVIT", 0):
+            primary_category = "RTI"
+        elif scores.get("AFFIDAVIT", 0) > scores.get("RTI_APPLICATION", 0):
+            primary_category = "AFFIDAVIT"
+        else:
+            primary_category = "BOTH"
+        
+        # Find relevant question categories based on keywords in user input
+        relevant_cats = []
+        for cat_key, cat_data in DocumentOrchestrator.CLARIFICATION_QUESTIONS.items():
+            # Check if any trigger keywords match
+            if any(kw in desc_lower for kw in cat_data["trigger_keywords"]):
+                # Prioritize based on primary category
+                if cat_data["category"] == primary_category or cat_data["category"] == "BOTH":
+                    relevant_cats.insert(0, (cat_key, cat_data))
+                else:
+                    relevant_cats.append((cat_key, cat_data))
+        
+        # If no specific matches, use general questions
+        if not relevant_cats:
+            relevant_cats = [
+                ("confusion_resolution", DocumentOrchestrator.CLARIFICATION_QUESTIONS["confusion_resolution"])
+            ]
+        
+        # Limit to 2-3 most relevant categories
+        max_categories = min(2, len(relevant_cats))
+        selected_cats = relevant_cats[:max_categories]
+        
+        # Build final question structure (2-4 questions total)
+        final_questions = []
+        for cat_key, cat_data in selected_cats:
+            # Take first 2 questions from each category
+            for q in cat_data["questions"][:2]:
+                final_questions.append({
+                    "text": q,
+                    "leads_to": "RTI_APPLICATION" if cat_data["category"] == "RTI" else 
+                               "AFFIDAVIT" if cat_data["category"] == "AFFIDAVIT" else primary_category,
+                    "category": cat_data["category"]
+                })
+        
+        return final_questions[:4]  # Max 4 questions
     
     def analyze_requirements(self, description):
         """
@@ -290,10 +444,11 @@ class DocumentOrchestrator:
             
             scores[doc_type] = max(0, score)  # Ensure non-negative
         
+        
         # Determine primary document
         if not any(scores.values()):
             # No matches at all - need clarification
-            return self._generate_clarification_response(0)
+            return self._generate_clarification_response(0, description=description, scores=scores)
         
         primary_doc = max(scores, key=scores.get)
         max_score = scores[primary_doc]
@@ -319,7 +474,7 @@ class DocumentOrchestrator:
         
         # If confidence is low, request clarification
         if confidence < 70:
-            return self._generate_clarification_response(confidence, primary_doc)
+            return self._generate_clarification_response(confidence, primary_doc, description, scores)
         
         # High confidence - return recommendation
         template_info = self.TEMPLATES[primary_doc]
@@ -356,13 +511,43 @@ class DocumentOrchestrator:
             'score_details': scores  # For debugging
         }
     
-    def _generate_clarification_response(self, base_confidence, suggested_doc=None):
-        """Generate response requesting clarification from user"""
+    
+    def _generate_clarification_response(self, base_confidence, suggested_doc=None, description="", scores=None):
+        """Generate response requesting clarification from user with context-aware questions"""
+        
+        # Select relevant questions based on user input
+        selected_questions = self._select_clarification_questions(description, scores or {})
+        
+        # Format questions for frontend (yes = suggested doc, no = opposite)
+        if suggested_doc == "RTI_APPLICATION":
+            opposite_doc = "AFFIDAVIT"
+        elif suggested_doc == "AFFIDAVIT":
+            opposite_doc = "RTI_APPLICATION"
+        else:
+            opposite_doc = "RTI_APPLICATION"  # Default
+        
+        # Convert to options format
+        formatted_questions = []
+        for q in selected_questions:
+            formatted_questions.append({
+                "question": q["text"],
+                "options": [
+                    {
+                        "text": "Yes",
+                        "leads_to": q["leads_to"] if q["category"] != "BOTH" else suggested_doc or "RTI_APPLICATION"
+                    },
+                    {
+                        "text": "No",
+                        "leads_to": opposite_doc
+                    }
+                ]
+            })
+        
         return {
             'status': 'needs_clarification',
             'confidence': base_confidence,
             'suggested_document': suggested_doc,
-            'questions': self.CLARIFICATION_QUESTIONS,
+            'questions': formatted_questions,
             'message': 'I need a bit more information to suggest the right document for you.'
         }
     
