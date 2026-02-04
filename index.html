@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NyaySetu - AI Legal Document Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-size: 1em;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .analysis-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .analysis-result.show {
+            display: block;
+        }
+
+        .complexity-score {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .challenges {
+            margin-top: 15px;
+        }
+
+        .challenge-item {
+            padding: 10px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .validation-warnings {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .validation-warnings.show {
+            display: block;
+        }
+
+        .warning-item {
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ NyaySetu</h1>
+            <p>AI-Powered Legal Document Generation Platform</p>
+            <p style="font-size: 0.9em;">Blockchain-Verified | Court-Ready Documents</p>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('analyze')">📊 AI Analysis</button>
+                <button class="tab" onclick="switchTab('rti')">📄 RTI Application</button>
+                <button class="tab" onclick="switchTab('affidavit')">📝 Affidavit</button>
+            </div>
+
+            <!-- AI Analysis Tab -->
+            <div id="analyze-tab" class="tab-content active">
+                <div class="info-box">
+                    <strong>🤖 AI-Powered Requirement Analysis</strong><br>
+                    Describe your legal documentation need in plain language. Our AI will analyze and suggest the best document type.
+                </div>
+
+                <div class="form-group">
+                    <label for="requirement">Describe Your Need:</label>
+                    <textarea id="requirement" placeholder="Example: I need to get my exam records from the university for visa application"></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="analyzeRequirement()">
+                    🔍 Analyze Requirement
+                </button>
+
+                <div id="analysis-result" class="analysis-result">
+                    <h3>📊 Analysis Results</h3>
+                    <div id="analysis-content"></div>
+                </div>
+
+                <div class="loading" id="analyze-loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing your requirement...</p>
+                </div>
+            </div>
+
+            <!-- RTI Form Tab -->
+            <div id="rti-tab" class="tab-content">
+                <h2>RTI Application Generator</h2>
+                <p style="color: #666; margin-bottom: 20px;">Fill in the details to generate a court-ready RTI application</p>
+
+                <form id="rti-form">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="mobile">Mobile Number</label>
+                            <input type="tel" id="mobile">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Complete Address *</label>
+                        <textarea id="address" required></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="state">State *</label>
+                            <select id="state" required>
+                                <option value="">Select State</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Gujarat">Gujarat</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="place">Place</label>
+                            <input type="text" id="place">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="authority">Public Authority/Department Name *</label>
+                        <input type="text" id="authority" required placeholder="e.g., Mumbai Municipal Corporation">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pio_address">PIO Office Address *</label>
+                        <textarea id="pio_address" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="info">Information Sought (Be Specific) *</label>
+                        <textarea id="info" required placeholder="Clearly describe what information you need. Include dates, file numbers, document names if known."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="bpl" onchange="toggleBPL()">
+                                I am a BPL cardholder
+                            </label>
+                        </div>
+                        <div class="form-group" id="bpl-card-group" style="display: none;">
+                            <label for="bpl_card_no">BPL Card Number</label>
+                            <input type="text" id="bpl_card_no">
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="payment-group">
+                        <label for="payment_method">Payment Method</label>
+                        <select id="payment_method">
+                            <option value="Demand Draft">Demand Draft</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Online">Online Transfer</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        🚀 Generate RTI Application
+                    </button>
+                </form>
+
+                <div class="validation-warnings" id="rti-warnings"></div>
+                <div class="success-message" id="rti-success"></div>
+                <div class="error-message" id="rti-error"></div>
+                <div class="loading" id="rti-loading">
+                    <div class="spinner"></div>
+                    <p>Generating your RTI application...</p>
+                </div>
+            </div>
+
+            <!-- Affidavit Form Tab -->
+            <div id="affidavit-tab" class="tab-content">
+                <h2>Affidavit Generator</h2>
+                <p style="color: #666; margin-bottom: 20px;">Create a legally valid affidavit</p>
+
+                <form id="affidavit-form">
+                    <div class="form-group">
+                        <label for="aff_name">Deponent Name *</label>
+                        <input type="text" id="aff_name" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="father_name">Father's Name</label>
+                            <input type="text" id="father_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="aff_address">Address *</label>
+                        <textarea id="aff_address" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="aff_place">Place</label>
+                        <input type="text" id="aff_place">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="court_name">Court Name (Optional)</label>
+                        <input type="text" id="court_name" placeholder="e.g., High Court of Mumbai">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="case_number">Case Number (Optional)</label>
+                        <input type="text" id="case_number" placeholder="e.g., WP 12345/2024">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Statements (Add at least 3):</label>
+                        <div id="statements-container">
+                            <textarea class="statement-input" placeholder="Statement 1"></textarea>
+                            <textarea class="statement-input" placeholder="Statement 2"></textarea>
+                            <textarea class="statement-input" placeholder="Statement 3"></textarea>
+                        </div>
+                        <button type="button" class="btn" onclick="addStatement()" style="margin-top: 10px;">+ Add Statement</button>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        🚀 Generate Affidavit
+                    </button>
+                </form>
+
+                <div class="success-message" id="aff-success"></div>
+                <div class="error-message" id="aff-error"></div>
+                <div class="loading" id="aff-loading">
+                    <div class="spinner"></div>
+                    <p>Generating your affidavit...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL - Change this for production
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:5000' 
+            : 'https://your-app-name.onrender.com';
+
+        function switchTab(tab) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleBPL() {
+            const bpl = document.getElementById('bpl').checked;
+            document.getElementById('bpl-card-group').style.display = bpl ? 'block' : 'none';
+            document.getElementById('payment-group').style.display = bpl ? 'none' : 'block';
+        }
+
+        function addStatement() {
+            const container = document.getElementById('statements-container');
+            const count = container.children.length + 1;
+            const textarea = document.createElement('textarea');
+            textarea.className = 'statement-input';
+            textarea.placeholder = `Statement ${count}`;
+            textarea.style.marginTop = '10px';
+            container.appendChild(textarea);
+        }
+
+        async function analyzeRequirement() {
+            const requirement = document.getElementById('requirement').value.trim();
+            
+            if (!requirement) {
+                alert('Please describe your requirement');
+                return;
+            }
+
+            const loading = document.getElementById('analyze-loading');
+            const resultDiv = document.getElementById('analysis-result');
+            
+            loading.classList.add('show');
+            resultDiv.classList.remove('show');
+
+            try {
+                const response = await fetch(`${API_URL}/api/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ description: requirement })
+                });
+
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const analysis = data.analysis;
+                    let html = `
+                        <div class="complexity-score">${analysis.complexity_score}/100</div>
+                        <p><strong>Recommended Document:</strong> ${analysis.document_name}</p>
+                        <p><strong>Complexity Level:</strong> ${analysis.estimated_complexity}/10</p>
+                        <p><strong>Estimated Time:</strong> ${analysis.estimated_time_minutes} minutes</p>
+                        <p><strong>Approach:</strong> ${analysis.recommended_approach}</p>
+                    `;
+                    
+                    if (analysis.potential_challenges && analysis.potential_challenges.length > 0) {
+                        html += '<div class="challenges"><strong>⚠️ Potential Challenges:</strong>';
+                        analysis.potential_challenges.forEach(challenge => {
+                            html += `<div class="challenge-item">${challenge}</div>`;
+                        });
+                        html += '</div>';
+                    }
+                    
+                    document.getElementById('analysis-content').innerHTML = html;
+                    resultDiv.classList.add('show');
+                    
+                    // Auto-switch to appropriate tab
+                    if (analysis.primary_document === 'RTI_APPLICATION') {
+                        setTimeout(() => {
+                            document.querySelector('[onclick*="rti"]').click();
+                        }, 2000);
+                    } else if (analysis.primary_document === 'AFFIDAVIT') {
+                        setTimeout(() => {
+                            document.querySelector('[onclick*="affidavit"]').click();
+                        }, 2000);
+                    }
+                }
+            } catch (error) {
+                alert('Error analyzing requirement: ' + error.message);
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        // RTI Form Submission
+        document.getElementById('rti-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loading = document.getElementById('rti-loading');
+            const successDiv = document.getElementById('rti-success');
+            const errorDiv = document.getElementById('rti-error');
+            const warningsDiv = document.getElementById('rti-warnings');
+            
+            loading.classList.add('show');
+            successDiv.classList.remove('show');
+            errorDiv.classList.remove('show');
+            warningsDiv.classList.remove('show');
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                mobile: document.getElementById('mobile').value,
+                email: document.getElementById('email').value,
+                address: document.getElementById('address').value,
+                state: document.getElementById('state').value,
+                place: document.getElementById('place').value,
+                authority: document.getElementById('authority').value,
+                pio_address: document.getElementById('pio_address').value,
+                info: document.getElementById('info').value,
+                bpl: document.getElementById('bpl').checked,
+                bpl_card_no: document.getElementById('bpl_card_no').value,
+                payment_method: document.getElementById('payment_method').value
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/api/generate/rti`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const doc = data.document;
+                    
+                    // Show validation warnings if any
+                    if (doc.validation && !doc.validation.is_valid) {
+                        let warningsHtml = '<h4>⚠️ Validation Warnings:</h4>';
+                        doc.validation.issues.forEach(issue => {
+                            warningsHtml += `<div class="warning-item">❌ ${issue}</div>`;
+                        });
+                        doc.validation.suggestions.forEach(suggestion => {
+                            warningsHtml += `<div class="warning-item">💡 ${suggestion}</div>`;
+                        });
+                        warningsDiv.innerHTML = warningsHtml;
+                        warningsDiv.classList.add('show');
+                    }
+                    
+                    successDiv.innerHTML = `
+                        <h3>✅ RTI Application Generated Successfully!</h3>
+                        <p><strong>Reference Number:</strong> ${doc.reference_number}</p>
+                        <p><strong>Document Hash:</strong> ${doc.hash.substring(0, 16)}...</p>
+                        <a href="${API_URL}${doc.download_url}" class="download-btn" download>
+                            📥 Download PDF
+                        </a>
+                    `;
+                    successDiv.classList.add('show');
+                    
+                    // Reset form
+                    e.target.reset();
+                } else {
+                    errorDiv.textContent = data.message || 'Error generating document';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
+        });
+
+        // Affidavit Form Submission
+        document.getElementById('affidavit-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loading = document.getElementById('aff-loading');
+            const successDiv = document.getElementById('aff-success');
+            const errorDiv = document.getElementById('aff-error');
+            
+            loading.classList.add('show');
+            successDiv.classList.remove('show');
+            errorDiv.classList.remove('show');
+            
+            // Collect statements
+            const statements = [];
+            document.querySelectorAll('.statement-input').forEach(input => {
+                if (input.value.trim()) {
+                    statements.push(input.value.trim());
+                }
+            });
+            
+            if (statements.length < 3) {
+                alert('Please add at least 3 statements');
+                loading.classList.remove('show');
+                return;
+            }
+            
+            const formData = {
+                deponent_name: document.getElementById('aff_name').value,
+                father_name: document.getElementById('father_name').value,
+                age: document.getElementById('age').value,
+                address: document.getElementById('aff_address').value,
+                place: document.getElementById('aff_place').value,
+                court_name: document.getElementById('court_name').value,
+                case_number: document.getElementById('case_number').value,
+                statements: statements
+            };
+            
+            try {
+                const response = await fetch(`${API_URL}/api/generate/affidavit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const doc = data.document;
+                    successDiv.innerHTML = `
+                        <h3>✅ Affidavit Generated Successfully!</h3>
+                        <p><strong>Document Hash:</strong> ${doc.hash.substring(0, 16)}...</p>
+                        <a href="${API_URL}${doc.download_url}" class="download-btn" download>
+                            📥 Download PDF
+                        </a>
+                    `;
+                    successDiv.classList.add('show');
+                    e.target.reset();
+                } else {
+                    errorDiv.textContent = data.message || 'Error generating document';
+                    errorDiv.classList.add('show');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+{
+  "categories": {
+    "public_records": {
+      "name": "Public Records & Documents",
+      "section_8_exempt": false,
+      "examples": [
+        "Tender documents",
+        "Public contracts",
+        "Meeting minutes",
+        "Budget allocations",
+        "Work orders"
+      ],
+      "additional_clauses": [],
+      "processing_notes": "Standard RTI request"
+    },
+    "personal_information": {
+      "name": "Personal Information of Third Party",
+      "section_8_exempt": true,
+      "exemption_reference": "Section 8(1)(j)",
+      "examples": [
+        "Employee personal details",
+        "Medical records",
+        "Personal contact information"
+      ],
+      "additional_clauses": [
+        "public_interest_override"
+      ],
+      "processing_notes": "Requires public interest justification",
+      "warnings": [
+        "This request involves third-party personal information (Section 8(1)(j))",
+        "You must demonstrate public interest that outweighs privacy concerns",
+        "Request may be denied unless larger public interest is shown"
+      ]
+    },
+    "ongoing_investigation": {
+      "name": "Information Related to Ongoing Investigation",
+      "section_8_exempt": true,
+      "exemption_reference": "Section 8(1)(h)",
+      "examples": [
+        "Investigation reports",
+        "Inquiry proceedings",
+        "Enforcement actions"
+      ],
+      "additional_clauses": [
+        "investigation_disclaimer"
+      ],
+      "processing_notes": "May be rejected if investigation is active",
+      "warnings": [
+        "Information that would impede investigation process is exempt (Section 8(1)(h))",
+        "This request may be denied if investigation is ongoing",
+        "Consider requesting after investigation is completed"
+      ]
+    },
+    "commercial_confidence": {
+      "name": "Trade Secrets & Commercial Confidence",
+      "section_8_exempt": true,
+      "exemption_reference": "Section 8(1)(d)",
+      "examples": [
+        "Trade secrets",
+        "Intellectual property",
+        "Commercial strategies"
+      ],
+      "additional_clauses": [
+        "third_party_notice"
+      ],
+      "processing_notes": "Section 11 third-party notice will be issued",
+      "warnings": [
+        "Trade secrets and commercial confidence are protected (Section 8(1)(d))",
+        "Third party will be notified and given opportunity to object (Section 11)",
+        "Disclosure decision will be made after considering third-party objections"
+      ],
+      "mandatory_sections": ["section_11_consent"]
+    },
+    "national_security": {
+      "name": "Information Affecting National Security",
+      "section_8_exempt": true,
+      "exemption_reference": "Section 8(1)(a)",
+      "examples": [
+        "Defense matters",
+        "Intelligence operations",
+        "Strategic security"
+      ],
+      "additional_clauses": [],
+      "processing_notes": "Likely to be rejected - highest exemption level",
+      "warnings": [
+        "Information affecting sovereignty, integrity, or security is exempt (Section 8(1)(a))",
+        "This category has the strongest exemption under RTI Act",
+        "Request will likely be denied unless it pertains to corruption or human rights violations"
+      ],
+      "block_generation": true,
+      "block_message": "This information category is highly likely to be exempt. Consider narrowing your request to non-sensitive aspects."
+    },
+    "cabinet_papers": {
+      "name": "Cabinet Papers & Policy Decisions",
+      "section_8_exempt": true,
+      "exemption_reference": "Section 8(1)(i)",
+      "examples": [
+        "Cabinet records",
+        "Council of Ministers decisions"
+      ],
+      "additional_clauses": [],
+      "processing_notes": "Exempt for 20 years from date of decision",
+      "warnings": [
+        "Cabinet papers are exempt under Section 8(1)(i)",
+        "Information older than 20 years may be available",
+        "You can request factual reports or analysis, but not cabinet deliberations"
+      ],
+      "time_based_exemption": {
+        "exempt_period_years": 20,
+        "exemption_type": "deliberation_only"
+      }
+    },
+    "court_proceedings": {
+      "name": "Information Related to Court Proceedings",
+      "section_8_exempt": true,
+      "exemption_reference": "Section 8(1)(h)",
+      "examples": [
+        "Ongoing litigation details",
+        "Court case strategies"
+      ],
+      "additional_clauses": [],
+      "processing_notes": "May be exempt if it would impede fair trial",
+      "warnings": [
+        "Information that would impede fair trial is exempt (Section 8(1)(h))",
+        "Public court records are generally available through court registries",
+        "Consider obtaining information directly from court if it's a public record"
+      ]
+    },
+    "financial_information": {
+      "name": "Financial Records & Transactions",
+      "section_8_exempt": false,
+      "examples": [
+        "Budget documents",
+        "Expenditure statements",
+        "Audit reports",
+        "Payment records"
+      ],
+      "additional_clauses": [],
+      "processing_notes": "Generally available unless exempted under other sections"
+    },
+    "infrastructure_projects": {
+      "name": "Infrastructure & Development Projects",
+      "section_8_exempt": false,
+      "examples": [
+        "Project approvals",
+        "Contractor details",
+        "Environmental clearances",
+        "Land acquisition records"
+      ],
+      "additional_clauses": [],
+      "processing_notes": "High public interest - strong case for disclosure"
+    },
+    "education_records": {
+      "name": "Educational Institution Records",
+      "section_8_exempt": false,
+      "examples": [
+        "Infrastructure details",
+        "Teacher appointments",
+        "Fund utilization"
+      ],
+      "additional_clauses": [],
+      "processing_notes": "Student personal information is exempt"
+    }
+  },
+  "additional_clauses_library": {
+    "public_interest_override": {
+      "text": "I submit that disclosure of the requested information is in larger public interest and outweighs the privacy concerns under Section 8(1)(j) of the RTI Act, 2005, as it pertains to {public_interest_reason}.",
+      "requires_input": ["public_interest_reason"],
+      "legal_reference": "Section 8(1)(j) - Public Interest Exception"
+    },
+    "investigation_disclaimer": {
+      "text": "I understand that if the requested information pertains to ongoing investigation, the same may be denied under Section 8(1)(h). However, I request that any non-exempt portion of the information be provided as per Section 10 of the RTI Act.",
+      "requires_input": [],
+      "legal_reference": "Section 10 - Severability"
+    },
+    "third_party_notice": {
+      "text": "I understand that third-party notice under Section 11 of the RTI Act may be issued for this request. I request that the process be expedited and any non-confidential information be provided meanwhile.",
+      "requires_input": [],
+      "legal_reference": "Section 11 - Third Party Information"
+    },
+    "section_11_consent": {
+      "text": "I acknowledge that this request involves third-party commercial information. I request the Public Information Officer to issue notice under Section 11 to the concerned third party and proceed as per provisions of the RTI Act, 2005.",
+      "requires_input": [],
+      "legal_reference": "Section 11 - Third Party Information",
+      "mandatory": true
+    },
+    "severability_request": {
+      "text": "In case any part of the requested information is exempt, I request that the non-exempt portions be provided separately as per Section 10 of the RTI Act, 2005.",
+      "requires_input": [],
+      "legal_reference": "Section 10 - Severability"
+    }
+  },
+  "auto_detect_keywords": {
+    "personal_information": [
+      "employee name",
+      "personal details",
+      "home address",
+      "phone number",
+      "email address",
+      "medical record",
+      "caste",
+      "religion",
+      "salary slip"
+    ],
+    "ongoing_investigation": [
+      "investigation",
+      "inquiry report",
+      "pending case",
+      "enforcement action",
+      "vigilance report"
+    ],
+    "commercial_confidence": [
+      "trade secret",
+      "commercial strategy",
+      "proprietary",
+      "business plan",
+      "intellectual property",
+      "pricing strategy"
+    ],
+    "national_security": [
+      "defense",
+      "military",
+      "intelligence",
+      "border security",
+      "classified",
+      "restricted"
+    ],
+    "cabinet_papers": [
+      "cabinet decision",
+      "council of ministers",
+      "cabinet meeting",
+      "cabinet note"
+    ]
+  }
+}

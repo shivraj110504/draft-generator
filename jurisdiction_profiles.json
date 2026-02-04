@@ -1,0 +1,290 @@
+{
+  "Maharashtra": {
+    "state_code": "MH",
+    "capital": "Mumbai",
+    "rti_rules": {
+      "fee": 10,
+      "payment_modes": ["Court Fee Stamp", "Demand Draft", "IPO", "Online Payment"],
+      "bpl_exemption": true,
+      "stamp_required": false,
+      "language_options": ["English", "Marathi"],
+      "pio_designation": "Public Information Officer",
+      "appellate_designation": "First Appellate Authority",
+      "commission": "Maharashtra State Information Commission, Mumbai"
+    },
+    "affidavit_rules": {
+      "notary_required": true,
+      "oath_commissioner_accepted": true,
+      "stamp_paper_value": 100,
+      "stamp_mandatory": true,
+      "verification_format": "magistrate_court",
+      "court_designation": "Judicial Magistrate First Class",
+      "language_options": ["English", "Marathi"],
+      "guardian_age_limit": 18,
+      "witness_required": false
+    },
+    "legal_notice_rules": {
+      "min_notice_period_days": 15,
+      "registered_post_mandatory": true,
+      "stamp_required": false,
+      "lawyer_signature_preferred": true
+    },
+    "court_formats": {
+      "district_court": "District and Sessions Court",
+      "magistrate": "Court of Judicial Magistrate First Class",
+      "high_court": "High Court of Judicature at Bombay"
+    }
+  },
+  "Karnataka": {
+    "state_code": "KA",
+    "capital": "Bengaluru",
+    "rti_rules": {
+      "fee": 10,
+      "payment_modes": ["DD", "IPO", "Online Payment via Sakala"],
+      "bpl_exemption": true,
+      "stamp_required": false,
+      "language_options": ["English", "Kannada"],
+      "pio_designation": "Public Information Officer",
+      "appellate_designation": "First Appellate Authority",
+      "commission": "Karnataka State Information Commission, Bengaluru"
+    },
+    "affidavit_rules": {
+      "notary_required": true,
+      "oath_commissioner_accepted": true,
+      "stamp_paper_value": 20,
+      "stamp_mandatory": true,
+      "verification_format": "notary_format",
+      "court_designation": "Principal Civil Judge",
+      "language_options": ["English", "Kannada"],
+      "guardian_age_limit": 18,
+      "witness_required": false
+    },
+    "legal_notice_rules": {
+      "min_notice_period_days": 15,
+      "registered_post_mandatory": true,
+      "stamp_required": false,
+      "lawyer_signature_preferred": true
+    },
+    "court_formats": {
+      "district_court": "District and Sessions Court",
+      "magistrate": "Court of Principal Civil Judge and JMFC",
+      "high_court": "High Court of Karnataka"
+    }
+  },
+  "Delhi": {
+    "state_code": "DL",
+    "capital": "New Delhi",
+    "rti_rules": {
+      "fee": 10,
+      "payment_modes": ["DD", "IPO", "Cash (at counter)", "Online Payment"],
+      "bpl_exemption": true,
+      "stamp_required": false,
+      "language_options": ["English", "Hindi"],
+      "pio_designation": "Central Public Information Officer",
+      "appellate_designation": "Appellate Authority",
+      "commission": "Central Information Commission, New Delhi"
+    },
+    "affidavit_rules": {
+      "notary_required": true,
+      "oath_commissioner_accepted": true,
+      "stamp_paper_value": 10,
+      "stamp_mandatory": true,
+      "verification_format": "magistrate_court",
+      "court_designation": "Metropolitan Magistrate",
+      "language_options": ["English", "Hindi"],
+      "guardian_age_limit": 18,
+      "witness_required": false
+    },
+    "legal_notice_rules": {
+      "min_notice_period_days": 15,
+      "registered_post_mandatory": true,
+      "stamp_required": false,
+      "lawyer_signature_preferred": true
+    },
+    "court_formats": {
+      "district_court": "District and Sessions Court",
+      "magistrate": "Court of Metropolitan Magistrate",
+      "high_court": "High Court of Delhi"
+    }
+  },
+  "Tamil Nadu": {
+    "state_code": "TN",
+    "capital": "Chennai",
+    "rti_rules": {
+      "fee": 10,
+      "payment_modes": ["DD", "IPO"],
+      "bpl_exemption": true,
+      "stamp_required": false,
+      "language_options": ["English", "Tamil"],
+      "pio_designation": "Public Information Officer",
+      "appellate_designation": "First Appellate Authority",
+      "commission": "Tamil Nadu State Information Commission, Chennai"
+    },
+    "affidavit_rules": {
+      "notary_required": true,
+      "oath_commissioner_accepted": true,
+      "stamp_paper_value": 20,
+      "stamp_mandatory": true,
+      "verification_format": "notary_format",
+      "court_designation": "Judicial Magistrate",
+      "language_options": ["English", "Tamil"],
+      "guardian_age_limit": 18,
+      "witness_required": false
+    },
+    "legal_notice_rules": {
+      "min_notice_period_days": 15,
+      "registered_post_mandatory": true,
+      "stamp_required": false,
+      "lawyer_signature_preferred": true
+    },
+    "court_formats": {
+      "district_court": "District Munsif Court",
+      "magistrate": "Court of Judicial Magistrate",
+      "high_court": "High Court of Madras"
+    }
+  },
+  "West Bengal": {
+    "state_code": "WB",
+    "capital": "Kolkata",
+    "rti_rules": {
+      "fee": 10,
+      "payment_modes": ["Court Fee Stamp", "DD", "IPO"],
+      "bpl_exemption": true,
+      "stamp_required": false,
+      "language_options": ["English", "Bengali"],
+      "pio_designation": "Public Information Officer",
+      "appellate_designation": "First Appellate Authority",
+      "commission": "West Bengal State Information Commission, Kolkata"
+    },
+    "affidavit_rules": {
+      "notary_required": true,
+      "oath_commissioner_accepted": true,
+      "stamp_paper_value": 10,
+      "stamp_mandatory": true,
+      "verification_format": "magistrate_court",
+      "court_designation": "Chief Judicial Magistrate",
+      "language_options": ["English", "Bengali"],
+      "guardian_age_limit": 18,
+      "witness_required": true
+    },
+    "legal_notice_rules": {
+      "min_notice_period_days": 15,
+      "registered_post_mandatory": true,
+      "stamp_required": false,
+      "lawyer_signature_preferred": true
+    },
+    "court_formats": {
+      "district_court": "District Judge Court",
+      "magistrate": "Court of Chief Judicial Magistrate",
+      "high_court": "High Court at Calcutta"
+    }
+  },
+  "Gujarat": {
+    "state_code": "GJ",
+    "capital": "Gandhinagar",
+    "rti_rules": {
+      "fee": 10,
+      "payment_modes": ["Court Fee Stamp", "DD"],
+      "bpl_exemption": true,
+      "stamp_required": false,
+      "language_options": ["English", "Gujarati"],
+      "pio_designation": "Public Information Officer",
+      "appellate_designation": "First Appellate Authority",
+      "commission": "Gujarat State Information Commission, Gandhinagar"
+    },
+    "affidavit_rules": {
+      "notary_required": true,
+      "oath_commissioner_accepted": true,
+      "stamp_paper_value": 20,
+      "stamp_mandatory": true,
+      "verification_format": "notary_format",
+      "court_designation": "Civil Judge and JMFC",
+      "language_options": ["English", "Gujarati"],
+      "guardian_age_limit": 18,
+      "witness_required": false
+    },
+    "legal_notice_rules": {
+      "min_notice_period_days": 15,
+      "registered_post_mandatory": true,
+      "stamp_required": false,
+      "lawyer_signature_preferred": true
+    },
+    "court_formats": {
+      "district_court": "District and Sessions Court",
+      "magistrate": "Court of Civil Judge and JMFC",
+      "high_court": "High Court of Gujarat"
+    }
+  },
+  "Uttar Pradesh": {
+    "state_code": "UP",
+    "capital": "Lucknow",
+    "rti_rules": {
+      "fee": 10,
+      "payment_modes": ["Court Fee Stamp", "DD", "IPO"],
+      "bpl_exemption": true,
+      "stamp_required": false,
+      "language_options": ["English", "Hindi"],
+      "pio_designation": "Lok Suchna Adhikari (Public Information Officer)",
+      "appellate_designation": "Pratham Apiliya Adhikari (First Appellate Authority)",
+      "commission": "Uttar Pradesh State Information Commission, Lucknow"
+    },
+    "affidavit_rules": {
+      "notary_required": true,
+      "oath_commissioner_accepted": true,
+      "stamp_paper_value": 10,
+      "stamp_mandatory": true,
+      "verification_format": "magistrate_court",
+      "court_designation": "Chief Judicial Magistrate",
+      "language_options": ["English", "Hindi"],
+      "guardian_age_limit": 18,
+      "witness_required": false
+    },
+    "legal_notice_rules": {
+      "min_notice_period_days": 15,
+      "registered_post_mandatory": true,
+      "stamp_required": false,
+      "lawyer_signature_preferred": true
+    },
+    "court_formats": {
+      "district_court": "District and Sessions Court",
+      "magistrate": "Court of Chief Judicial Magistrate",
+      "high_court": "High Court of Judicature at Allahabad"
+    }
+  },
+  "Rajasthan": {
+    "state_code": "RJ",
+    "capital": "Jaipur",
+    "rti_rules": {
+      "fee": 10,
+      "payment_modes": ["DD", "IPO"],
+      "bpl_exemption": true,
+      "stamp_required": false,
+      "language_options": ["English", "Hindi"],
+      "pio_designation": "Public Information Officer",
+      "appellate_designation": "First Appellate Authority",
+      "commission": "Rajasthan State Information Commission, Jaipur"
+    },
+    "affidavit_rules": {
+      "notary_required": true,
+      "oath_commissioner_accepted": true,
+      "stamp_paper_value": 20,
+      "stamp_mandatory": true,
+      "verification_format": "notary_format",
+      "court_designation": "Judicial Magistrate First Class",
+      "language_options": ["English", "Hindi"],
+      "guardian_age_limit": 18,
+      "witness_required": false
+    },
+    "legal_notice_rules": {
+      "min_notice_period_days": 15,
+      "registered_post_mandatory": true,
+      "stamp_required": false,
+      "lawyer_signature_preferred": true
+    },
+    "court_formats": {
+      "district_court": "District and Sessions Court",
+      "magistrate": "Court of Judicial Magistrate First Class",
+      "high_court": "High Court of Rajasthan"
+    }
+  }
+}

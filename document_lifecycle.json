@@ -1,0 +1,49 @@
+{
+  "47a92906ac4c8fe7c8231d04e54af75ed21090182c55748ede89b8f266417ae0": {
+    "document_type": "RTI_Application",
+    "created_date": "2026-02-04T15:25:37.539088",
+    "current_state": "DRAFTED",
+    "state_history": [
+      {
+        "state": "DRAFTED",
+        "timestamp": "2026-02-04T15:25:37.539093",
+        "notes": "Document generated"
+      }
+    ],
+    "metadata": {
+      "applicant_name": "shivraj taware",
+      "authority": "Revenue & Forest Department",
+      "state": "Maharashtra",
+      "detected_categories": [],
+      "jurisdiction": "Maharashtra"
+    },
+    "deadlines": {
+      "reply_deadline": "2026-03-06T15:25:37.539042",
+      "reply_deadline_days": 30,
+      "first_appeal_deadline": "2026-04-05T15:25:37.539042",
+      "first_appeal_days": 30,
+      "description": "RTI Act 2005 mandates response within 30 days of receipt"
+    },
+    "alerts": []
+  },
+  "cef43db662afa22dd407d5dd095f888b65d858d79ebd472a09b9441eeab954ef": {
+    "document_type": "Affidavit",
+    "created_date": "2026-02-04T15:27:56.396730",
+    "current_state": "DRAFTED",
+    "state_history": [
+      {
+        "state": "DRAFTED",
+        "timestamp": "2026-02-04T15:27:56.396747",
+        "notes": "Document generated"
+      }
+    ],
+    "metadata": {
+      "deponent_name": "jdflas",
+      "state": "Maharashtra",
+      "stamp_value": 100,
+      "guardian_required": false
+    },
+    "deadlines": {},
+    "alerts": []
+  }
+}
