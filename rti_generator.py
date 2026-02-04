@@ -226,13 +226,29 @@ as per {rules.get('fee_rule_citation', 'RTI Rules')}. Payment made via: {payment
             ('ALIGN', (1,0), (1,0), 'RIGHT'),
         ]))
         story.append(sig_table)
-        story.append(Spacer(1, 30))
+        story.append(Spacer(1, 35))
+
         
-        # Blockchain footer
-        story.append(Paragraph(
-            f"<i>Document Hash: {doc_hash}</i>",
-            self.styles["Normal"]
-        ))
+        
+        # Professional footer with document metadata
+        story.append(Spacer(1, 20))
+        
+        footer_text = (
+            f"<i>Document Hash: {doc_hash[:16]}... | "
+            f"Generated: {datetime.now().strftime('%d-%b-%Y %H:%M')} | "
+            f"Ref: {ref_num} | Applicant: {user_data['name']}</i>"
+        )
+        
+        footer_style = ParagraphStyle(
+            'FooterMeta',
+            fontSize=7,
+            fontName="Times-Roman",
+            textColor=colors.grey,
+            alignment=TA_CENTER
+        )
+        
+        story.append(Paragraph(footer_text, footer_style))
+
         
         # Build PDF
         doc.build(story)
