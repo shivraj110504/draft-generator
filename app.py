@@ -16,12 +16,17 @@ from orchestrator import DocumentOrchestrator
 
 # Configuration
 raw_origins = os.environ.get('ALLOWED_ORIGINS', '*')
-allowed_origins = [origin.strip() for origin in raw_origins.split(',')]
-print(f"CORS Allowed Origins: {allowed_origins}")
+# Split by comma, strip whitespace, and strip trailing slashes for robust matching
+allowed_origins = [origin.strip().rstrip('/') for origin in raw_origins.split(',')]
+print(f"CORS Allowed Origins (cleaned): {allowed_origins}")
 
 app = Flask(__name__)
-# Enable CORS for all /api/ routes
-CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
+# Enable CORS for all /api/ routes with support for credentials and common headers
+CORS(app, resources={r"/api/*": {
+    "origins": allowed_origins,
+    "methods": ["GET", "POST", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization"]
+}})
 
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
