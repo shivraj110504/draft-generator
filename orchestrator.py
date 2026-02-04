@@ -1,12 +1,15 @@
-"""
-Document Orchestrator - AI-powered requirement analysis
-"""
-
 import re
+import os
+import json
+from groq import Groq
 
 
 class DocumentOrchestrator:
     """Orchestrates multi-document generation with AI analysis"""
+    
+    def __init__(self):
+        """Initialize orchestrator with Groq client"""
+        self.groq_client = Groq(api_key=os.getenv('GROQ_API_KEY'))
     
     @staticmethod
     def _expand_keywords(base_keywords):
@@ -472,7 +475,29 @@ class DocumentOrchestrator:
         else:
             confidence = 50
         
-        # If confidence is low, request clarification
+        # If confidence is low, try Groq AI for higher accuracy (LLM fallback)
+        if confidence < 70 and hasattr(self, 'groq_client') and self.groq_client.api_key:
+            try:
+                groq_result = self._analyze_with_groq(description)
+                if groq_result and groq_result.get('confidence', 0) >= 80:
+                    primary_doc = groq_result['document_type']
+                    confidence = groq_result['confidence']
+                    # Increase score slightly for the chosen doc based on LLM confidence
+                    scores[primary_doc] = max(scores.get(primary_doc, 0), confidence)
+                elif groq_result and groq_result.get('clarification_needed'):
+                    # Groq suggests specific questions
+                    return self._generate_clarification_response(
+                        confidence, 
+                        primary_doc, 
+                        description, 
+                        scores, 
+                        llm_questions=groq_result.get('questions')
+                    )
+            except Exception as e:
+                print(f"Groq API error: {e}")
+                # Fall through to standard keyword-based clarification
+        
+        # If still low confidence, request clarification
         if confidence < 70:
             return self._generate_clarification_response(confidence, primary_doc, description, scores)
         
@@ -512,40 +537,95 @@ class DocumentOrchestrator:
         }
     
     
-    def _generate_clarification_response(self, base_confidence, suggested_doc=None, description="", scores=None):
+    def _analyze_with_groq(self, description):
+        """Analyze user requirement using Groq AI LLM for high accuracy"""
+        system_prompt = """You are an expert legal document router for Indian law (NyaySetu project).
+Your task is to analyze user requirement and determine if they need an RTI Application or an Affidavit.
+
+RTI APPLICATION is for:
+- Requesting specific information, records, or documents from government / public authorities.
+- Seeking transparency on government actions, status of complaints, or fund utilization.
+- Examples: marksheets from universities, FIR copies, tender details, land records (7/12), ration card status.
+
+AFFIDAVIT is for:
+- Personal sworn declarations or statements of facts made under oath.
+- Proving identity, address, income, or relationship status officially.
+- Declarations for lost documents, name changes, education gaps, or court filings.
+- Examples: Name correction affidavit, Income affidavit, Gap certificate affidavit, Legal heir declaration.
+
+Response format (JSON only):
+{
+  "document_type": "RTI_APPLICATION" or "AFFIDAVIT",
+  "confidence": 0-100,
+  "reasoning": "Short explanation",
+  "clarification_needed": true/false,
+  "questions": ["Specific question to distinguish if unsure"]
+}"""
+
+        try:
+            chat_completion = self.groq_client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"User's legal need: {description}"}
+                ],
+                model="llama-3.3-70b-versatile",
+                response_format={"type": "json_object"},
+                temperature=0.1
+            )
+            return json.loads(chat_completion.choices[0].message.content)
+        except Exception as e:
+            print(f"Groq internal error: {e}")
+            return None
+
+    
+    def _generate_clarification_response(self, base_confidence, suggested_doc=None, description="", scores=None, llm_questions=None):
         """Generate response requesting clarification from user with context-aware questions"""
         
-        # Select relevant questions based on user input
-        selected_questions = self._select_clarification_questions(description, scores or {})
+        # Priority 1: LLM-generated specific questions
+        # Priority 2: Keyword-based context questions
         
-        # Format questions for frontend (yes = suggested doc, no = opposite)
-        if suggested_doc == "RTI_APPLICATION":
-            opposite_doc = "AFFIDAVIT"
-        elif suggested_doc == "AFFIDAVIT":
-            opposite_doc = "RTI_APPLICATION"
-        else:
-            opposite_doc = "RTI_APPLICATION"  # Default
-        
-        # Convert to options format
         formatted_questions = []
-        for q in selected_questions:
-            formatted_questions.append({
-                "question": q["text"],
-                "options": [
-                    {
-                        "text": "Yes",
-                        "leads_to": q["leads_to"] if q["category"] != "BOTH" else suggested_doc or "RTI_APPLICATION"
-                    },
-                    {
-                        "text": "No",
-                        "leads_to": opposite_doc
-                    }
-                ]
-            })
+        
+        if llm_questions:
+            for q_text in llm_questions:
+                formatted_questions.append({
+                    "question": q_text,
+                    "options": [
+                        {"text": "Yes", "leads_to": suggested_doc or "RTI_APPLICATION"},
+                        {"text": "No", "leads_to": "AFFIDAVIT" if suggested_doc == "RTI_APPLICATION" else "RTI_APPLICATION"}
+                    ]
+                })
+        
+        # If no LLM questions or we want to supplement
+        if not formatted_questions:
+            selected_questions = self._select_clarification_questions(description, scores or {})
+            
+            # Format questions for frontend (yes = suggested doc, no = opposite)
+            if suggested_doc == "RTI_APPLICATION":
+                opposite_doc = "AFFIDAVIT"
+            elif suggested_doc == "AFFIDAVIT":
+                opposite_doc = "RTI_APPLICATION"
+            else:
+                opposite_doc = "RTI_APPLICATION"  # Default
+            
+            for q in selected_questions:
+                formatted_questions.append({
+                    "question": q["text"],
+                    "options": [
+                        {
+                            "text": "Yes",
+                            "leads_to": q["leads_to"] if q["category"] != "BOTH" else suggested_doc or "RTI_APPLICATION"
+                        },
+                        {
+                            "text": "No",
+                            "leads_to": opposite_doc
+                        }
+                    ]
+                })
         
         return {
             'status': 'needs_clarification',
-            'confidence': base_confidence,
+            'confidence': max(base_confidence, 55), # Slightly boost perceived confidence
             'suggested_document': suggested_doc,
             'questions': formatted_questions,
             'message': 'I need a bit more information to suggest the right document for you.'
