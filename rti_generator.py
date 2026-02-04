@@ -136,25 +136,6 @@ as per {rules.get('fee_rule_citation', 'RTI Rules')}. Payment made via: {payment
         
         story = []
         
-        # Validation warnings
-        if not validation['is_valid']:
-            warning_box = Table([[
-                Paragraph("<b>⚠ VALIDATION WARNINGS</b>", self.styles["Heading2"])
-            ]], colWidths=[5*inch])
-            warning_box.setStyle(TableStyle([
-                ('BACKGROUND', (0,0), (-1,-1), colors.Color(1, 0.95, 0.8)),
-                ('BORDER', (0,0), (-1,-1), 1, colors.orange),
-                ('PADDING', (0,0), (-1,-1), 10),
-            ]))
-            story.append(warning_box)
-            story.append(Spacer(1, 5))
-            
-            for issue in validation['issues']:
-                story.append(Paragraph(f"• {issue}", self.styles["Normal"]))
-            for suggestion in validation['suggestions']:
-                story.append(Paragraph(f"💡 {suggestion}", self.styles["Normal"]))
-            story.append(Spacer(1, 20))
-        
         # Title
         story.append(Paragraph(
             "APPLICATION UNDER RIGHT TO INFORMATION ACT, 2005",
@@ -190,36 +171,36 @@ as per {rules.get('fee_rule_citation', 'RTI Rules')}. Payment made via: {payment
         
         # Body
         story.append(Paragraph("Respected Sir/Madam,", self.styles["DocBody"]))
-        story.append(Spacer(1, 10))
+        story.append(Spacer(1, 15))
         
-        intro = f"""I, <b>{user_data['name']}</b>, residing at <b>{user_data['address']}</b>, 
-do hereby submit this application under Section 6(1) of the Right to Information Act, 2005, 
-seeking the following information:"""
+        intro = f"""I, <b>{user_data['name']}</b>, residing at <b>{user_data['address']}</b>, do hereby submit this application under the provisions of Section 6(1) of the Right to Information Act, 2005, seeking the following information from your esteemed office:"""
         story.append(Paragraph(intro, self.styles["DocBody"]))
         story.append(Spacer(1, 15))
         
-        # Information box
-        info_table = Table([[
-            Paragraph("<b>INFORMATION SOUGHT:</b>", self.styles["Heading2"])
-        ], [
-            Paragraph(user_data["info"], self.styles["DocBody"])
-        ]], colWidths=[5.5*inch])
-        info_table.setStyle(TableStyle([
-            ('BACKGROUND', (0,0), (-1,0), colors.Color(0.95, 0.95, 0.95)),
-            ('BACKGROUND', (0,1), (-1,-1), colors.Color(0.98, 0.98, 0.98)),
-            ('BORDER', (0,0), (-1,-1), 1, colors.grey),
-            ('PADDING', (0,0), (-1,-1), 12),
-        ]))
-        story.append(info_table)
+        # Information requested section
+        story.append(Paragraph("<b>INFORMATION REQUESTED:</b>", self.styles["Heading2"]))
+        story.append(Spacer(1, 10))
+        story.append(Paragraph(user_data["info"], self.styles["DocBody"]))
         story.append(Spacer(1, 15))
         
         # Fee clause
         fee_clause = self._generate_fee_clause(user_data, rules)
-        story.append(Paragraph("<b>Fee Payment:</b>", self.styles["Heading2"]))
         story.append(Paragraph(fee_clause, self.styles["DocBody"]))
         story.append(Spacer(1, 15))
         
-        # Contact details
+        # Additional standard clauses
+        story.append(Paragraph("I request that the information be provided in physical/electronic format as per my convenience.", self.styles["DocBody"]))
+        story.append(Spacer(1, 10))
+        
+        story.append(Paragraph("I hereby declare that the information sought does not fall within the restricted categories under Sections 8 and 9 of the RTI Act, 2005, to the best of my knowledge and belief. I undertake to pay any additional fee that may be required for providing the requested information.", self.styles["DocBody"]))
+        story.append(Spacer(1, 15))
+        
+        # Closing
+        story.append(Paragraph("Thanking you,", self.styles["DocBody"]))
+        story.append(Spacer(1, 10))
+        story.append(Paragraph("Yours faithfully,", self.styles["DocBody"]))
+        story.append(Spacer(1, 30))
+        
         contact_data = [
             ["Full Name:", user_data["name"]],
             ["Address:", user_data["address"]],
