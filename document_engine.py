@@ -88,14 +88,14 @@ class DocumentLifecycle:
     def __init__(self):
         self.db = NyaySetuDB()
         # Fallback to local dict if DB unavailable
-        self.lifecycles = self.db.get_lifecycles() if self.db.client else {}
+        self.lifecycles = self.db.get_lifecycles() if self.db.client is not None else {}
     
     def create_lifecycle(self, doc_hash, doc_type, metadata):
         """Create new document lifecycle"""
         # Calculate deadlines based on document type
         deadlines = self._calculate_deadlines(doc_type, metadata)
         
-        if self.db.client:
+        if self.db.client is not None:
             self.db.save_lifecycle(doc_hash, doc_type, metadata, deadlines)
             self.lifecycles = self.db.get_lifecycles()
         else:

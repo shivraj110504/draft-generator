@@ -58,7 +58,7 @@ def home():
             'download': '/api/download/<filename>',
             'states': '/api/states'
         },
-        'database': 'connected' if db.client else 'disconnected',
+        'database': 'connected' if db.client is not None else 'disconnected',
         'timestamp': datetime.now().isoformat()
     })
 

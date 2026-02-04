@@ -1,6 +1,9 @@
 import os
 import datetime
 import base64
+import uuid
+import time
+import requests
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
@@ -31,10 +34,20 @@ class NyaySetuDB:
 
     def store_document(self, doc_type, user_data, pdf_path, doc_hash, ref_num=None):
         """
-        Store document metadata and content (simulating blockchain/secure storage)
+        Store document metadata and content in the internal NyaySetu tracking DB
         """
-        if not self.db:
+        if self.db is None:
             return None
+
+        # Check for blockchain specific data
+        user_key = user_data.get('userKey')
+        username = user_data.get('username')
+        
+        # If userKey is provided, also store in the blockchain file_storage
+        if user_key:
+            print(f"DEBUG: userKey detected, storing in blockchain as well...")
+            filename = os.path.basename(pdf_path)
+            self.store_in_blockchain(user_key, username, pdf_path, filename)
 
         try:
             with open(pdf_path, "rb") as pdf_file:
@@ -58,8 +71,63 @@ class NyaySetuDB:
             print(f"❌ Error storing document: {e}")
             return None
 
+    def store_in_blockchain(self, user_key, username, pdf_path, original_filename):
+        """
+        Store document directly in the format expected by the Blockchain service's 'file_storage' DB
+        """
+        if self.client is None: return None
+
+        try:
+            # Connect to the file_storage database (used by blockchain service)
+            bc_db = self.client.get_database('file_storage')
+            files_col = bc_db["files"]
+
+            with open(pdf_path, "rb") as pdf_file:
+                file_content = pdf_file.read()
+                file_size = len(file_content)
+                file_base64 = base64.b64encode(file_content).decode('utf-8')
+
+            file_key = str(uuid.uuid4())
+            unique_id = str(uuid.uuid4())[:8]
+            secure_name = f"{int(time.time()*1000)}_{unique_id}_{original_filename}"
+
+            doc = {
+                "file_key": file_key,
+                "filename": original_filename, 
+                "secure_name": secure_name,   
+                "owner": user_key,
+                "shared_with": [],
+                "file_content": file_base64,
+                "file_size": file_size,
+                "created_at": time.time()
+            }
+
+            files_col.insert_one(doc)
+            print(f"✅ Document injected into Blockchain 'file_storage': {file_key}")
+
+            # Notify the blockchain service to add a transaction if URL is known
+            bc_service_url = os.environ.get('BLOCKCHAIN_SERVICE_URL')
+            if bc_service_url:
+                try:
+                    tx = {
+                        "user": username or "NyaySetu_AI",
+                        "v_file": original_filename,
+                        "file_key": file_key,
+                        "file_data": "Binary Content Stored in DB",
+                        "file_size": file_size
+                    }
+                    requests.post(f"{bc_service_url}/new_transaction", json=tx, timeout=2)
+                    print(f"✅ Transaction announced to Blockchain service")
+                except Exception as ex:
+                    print(f"⚠️ Could not announce to blockchain service: {ex}")
+
+            return file_key
+        except Exception as e:
+            print(f"❌ Error injecting into Blockchain DB: {e}")
+            return None
+
     def get_lifecycles(self):
-        if not self.db: return {}
+        if self.db is None: return {}
         try:
             cursor = self.db.lifecycles.find({})
             return {item['hash']: item for item in cursor}
@@ -67,7 +135,7 @@ class NyaySetuDB:
             return {}
 
     def save_lifecycle(self, doc_hash, doc_type, metadata, deadlines):
-        if not self.db: return
+        if self.db is None: return
         try:
             lifecycle = {
                 "hash": doc_hash,
@@ -92,7 +160,7 @@ class NyaySetuDB:
             print(f"❌ Error saving lifecycle to DB: {e}")
 
     def update_lifecycle_state(self, doc_hash, new_state, notes):
-        if not self.db: return False
+        if self.db is None: return False
         try:
             self.db.lifecycles.update_one(
                 {"hash": doc_hash},
