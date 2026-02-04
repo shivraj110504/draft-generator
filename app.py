@@ -15,9 +15,13 @@ from affidavit_generator_backend import AffidavitGenerator
 from orchestrator import DocumentOrchestrator
 
 # Configuration
-allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
+raw_origins = os.environ.get('ALLOWED_ORIGINS', '*')
+allowed_origins = [origin.strip() for origin in raw_origins.split(',')]
+print(f"CORS Allowed Origins: {allowed_origins}")
+
 app = Flask(__name__)
-CORS(app, origins=allowed_origins)  # Enable CORS for frontend
+# Enable CORS for all /api/ routes
+CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
 
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
