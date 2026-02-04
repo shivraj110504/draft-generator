@@ -10,12 +10,9 @@ import sys
 from datetime import datetime
 import json
 
-# Add generators to path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'generators'))
-
-from generators.rti_generator import RTIGenerator
-from generators.affidavit_generator import AffidavitGenerator
-from generators.orchestrator import DocumentOrchestrator
+from rti_generator import RTIGenerator
+from affidavit_generator_backend import AffidavitGenerator
+from orchestrator import DocumentOrchestrator
 
 # Configuration
 allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
@@ -198,7 +195,7 @@ def download_file(filename):
 def get_states():
     """Get list of supported states with rules"""
     try:
-        config_path = os.path.join(os.path.dirname(__file__), 'config', 'jurisdiction_rules.json')
+        config_path = os.path.join(os.path.dirname(__file__), 'jurisdiction_rules.json')
         
         with open(config_path, 'r') as f:
             rules = json.load(f)
