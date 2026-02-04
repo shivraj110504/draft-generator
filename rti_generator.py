@@ -218,15 +218,12 @@ as per {rules.get('fee_rule_citation', 'RTI Rules')}. Payment made via: {payment
         
         # Signature
         sig_data = [
-            ["Place: " + user_data.get("place", "_______________"), ""],
-            [f"Date: {datetime.now().strftime('%d-%B-%Y')}", ""],
-            ["", "Yours faithfully,"],
-            ["", "_________________________"],
-            ["", f"({user_data['name']})"],
+            ["Place: " + user_data.get("place", "_______________"), "Signature: ___________________"],
         ]
-        sig_table = Table(sig_data, colWidths=[3*inch, 2.5*inch])
+        sig_table = Table(sig_data, colWidths=[3*inch, 3*inch])
         sig_table.setStyle(TableStyle([
-            ('ALIGN', (1,0), (-1,-1), 'RIGHT'),
+            ('ALIGN', (0,0), (0,0), 'LEFT'),
+            ('ALIGN', (1,0), (1,0), 'RIGHT'),
         ]))
         story.append(sig_table)
         story.append(Spacer(1, 30))
