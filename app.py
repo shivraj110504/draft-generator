@@ -17,8 +17,10 @@ from generators.rti_generator import RTIGenerator
 from generators.affidavit_generator import AffidavitGenerator
 from generators.orchestrator import DocumentOrchestrator
 
+# Configuration
+allowed_origins = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
 app = Flask(__name__)
-CORS(app)  # Enable CORS for frontend
+CORS(app, origins=allowed_origins)  # Enable CORS for frontend
 
 # Configuration
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size

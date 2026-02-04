@@ -1,7 +1,7 @@
-reportlab==4.0.7
+reportlab==4.2.5
 cryptography==41.0.7
 qrcode==7.4.2
-Pillow==10.1.0
+Pillow==11.0.0
 Flask==3.0.0
 Flask-CORS==4.0.0
 gunicorn==21.2.0
