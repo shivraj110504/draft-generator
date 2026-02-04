@@ -19,7 +19,8 @@ class RTIGenerator:
     
     def __init__(self):
         self.styles = self._setup_styles()
-        self.output_dir = os.path.join(os.path.dirname(__file__), '..', 'outputs')
+        # Keep outputs local to the backend directory
+        self.output_dir = os.path.join(os.path.dirname(__file__), 'outputs')
         os.makedirs(self.output_dir, exist_ok=True)
     
     def _setup_styles(self):
@@ -50,7 +51,7 @@ class RTIGenerator:
     def _load_rules(self, state):
         """Load jurisdiction rules"""
         try:
-            config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'jurisdiction_rules.json')
+            config_path = os.path.join(os.path.dirname(__file__), 'jurisdiction_rules.json')
             with open(config_path, 'r') as f:
                 rules = json.load(f)
             return rules.get(state, rules.get('Maharashtra'))

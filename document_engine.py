@@ -24,6 +24,8 @@ import os
 import re
 
 
+from database import NyaySetuDB
+
 class JurisdictionManager:
     """Manages jurisdiction-specific legal requirements and formats"""
     
@@ -33,16 +35,18 @@ class JurisdictionManager:
     
     def load_profiles(self):
         """Load jurisdiction profiles"""
+        # Ensure path is local to the module
         profiles_path = os.path.join(os.path.dirname(__file__), 'jurisdiction_profiles.json')
         with open(profiles_path, 'r') as f:
             self.profiles = json.load(f)
     
     def load_categories(self):
         """Load RTI categories and compliance rules"""
+        # Ensure path is local to the module
         categories_path = os.path.join(os.path.dirname(__file__), 'rti_categories.json')
         with open(categories_path, 'r') as f:
             self.category_data = json.load(f)
-    
+
     def get_jurisdiction(self, state):
         """Get jurisdiction profile for state"""
         return self.profiles.get(state, self.profiles['Maharashtra'])
@@ -69,9 +73,8 @@ class JurisdictionManager:
         """Get additional clause text"""
         return self.category_data['additional_clauses_library'].get(clause_key, {})
 
-
 class DocumentLifecycle:
-    """Tracks document lifecycle and manages deadlines"""
+    """Tracks document lifecycle and manages deadlines using MongoDB"""
     
     STATES = {
         'DRAFTED': 'Document has been generated',
@@ -83,43 +86,35 @@ class DocumentLifecycle:
     }
     
     def __init__(self):
-        self.lifecycle_file = 'document_lifecycle.json'
-        self.lifecycles = self._load_lifecycles()
-    
-    def _load_lifecycles(self):
-        """Load existing lifecycle data"""
-        if os.path.exists(self.lifecycle_file):
-            with open(self.lifecycle_file, 'r') as f:
-                return json.load(f)
-        return {}
-    
-    def _save_lifecycles(self):
-        """Save lifecycle data"""
-        with open(self.lifecycle_file, 'w') as f:
-            json.dump(self.lifecycles, f, indent=2)
+        self.db = NyaySetuDB()
+        # Fallback to local dict if DB unavailable
+        self.lifecycles = self.db.get_lifecycles() if self.db.client else {}
     
     def create_lifecycle(self, doc_hash, doc_type, metadata):
         """Create new document lifecycle"""
         # Calculate deadlines based on document type
         deadlines = self._calculate_deadlines(doc_type, metadata)
         
-        self.lifecycles[doc_hash] = {
-            'document_type': doc_type,
-            'created_date': datetime.now().isoformat(),
-            'current_state': 'DRAFTED',
-            'state_history': [
-                {
-                    'state': 'DRAFTED',
-                    'timestamp': datetime.now().isoformat(),
-                    'notes': 'Document generated'
-                }
-            ],
-            'metadata': metadata,
-            'deadlines': deadlines,
-            'alerts': []
-        }
+        if self.db.client:
+            self.db.save_lifecycle(doc_hash, doc_type, metadata, deadlines)
+            self.lifecycles = self.db.get_lifecycles()
+        else:
+            # Fallback local storage (legacy)
+            self.lifecycles[doc_hash] = {
+                'document_type': doc_type,
+                'created_date': datetime.now().isoformat(),
+                'current_state': 'DRAFTED',
+                'state_history': [
+                    {
+                        'state': 'DRAFTED',
+                        'timestamp': datetime.now().isoformat(),
+                        'notes': 'Document generated'
+                    }
+                ],
+                'metadata': metadata,
+                'deadlines': deadlines
+            }
         
-        self._save_lifecycles()
         return deadlines
     
     def _calculate_deadlines(self, doc_type, metadata):

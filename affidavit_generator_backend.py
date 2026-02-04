@@ -19,7 +19,8 @@ class AffidavitGenerator:
     
     def __init__(self):
         self.styles = self._setup_styles()
-        self.output_dir = os.path.join(os.path.dirname(__file__), '..', 'outputs')
+        # Keep outputs local to the backend directory
+        self.output_dir = os.path.join(os.path.dirname(__file__), 'outputs')
         os.makedirs(self.output_dir, exist_ok=True)
     
     def _setup_styles(self):

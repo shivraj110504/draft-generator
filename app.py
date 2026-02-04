@@ -13,6 +13,7 @@ import json
 from rti_generator import RTIGenerator
 from affidavit_generator_backend import AffidavitGenerator
 from orchestrator import DocumentOrchestrator
+from database import NyaySetuDB
 
 # Configuration
 raw_origins = os.environ.get('ALLOWED_ORIGINS', '*')
@@ -35,11 +36,13 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-i
 
 # Ensure outputs directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+print(f"Upload Folder initialized at: {app.config['UPLOAD_FOLDER']}")
 
-# Initialize generators
+# Initialize generators and DB
 rti_generator = RTIGenerator()
 affidavit_generator = AffidavitGenerator()
 orchestrator = DocumentOrchestrator()
+db = NyaySetuDB()
 
 
 @app.route('/')
@@ -55,6 +58,7 @@ def home():
             'download': '/api/download/<filename>',
             'states': '/api/states'
         },
+        'database': 'connected' if db.client else 'disconnected',
         'timestamp': datetime.now().isoformat()
     })
 
@@ -112,6 +116,15 @@ def generate_rti():
         # Generate RTI document
         result = rti_generator.generate(data)
         
+        # Store in "blockchain" database
+        db.store_document(
+            doc_type="RTI_APPLICATION",
+            user_data=data,
+            pdf_path=result['pdf_file'],
+            doc_hash=result['document_hash'],
+            ref_num=result['reference_number']
+        )
+        
         # Get relative file path for download
         filename = os.path.basename(result['pdf_file'])
         
@@ -156,6 +169,14 @@ def generate_affidavit():
         # Generate affidavit
         result = affidavit_generator.generate(data)
         
+        # Store in "blockchain" database
+        db.store_document(
+            doc_type="AFFIDAVIT",
+            user_data=data,
+            pdf_path=result['pdf_file'],
+            doc_hash=result['document_hash']
+        )
+        
         filename = os.path.basename(result['pdf_file'])
         
         return jsonify({
@@ -181,6 +202,7 @@ def download_file(filename):
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         
         if not os.path.exists(file_path):
+            print(f"ERROR: File not found at {file_path}")
             return jsonify({
                 'status': 'error',
                 'message': 'File not found'
